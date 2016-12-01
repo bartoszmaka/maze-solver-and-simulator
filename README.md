@@ -12,4 +12,4 @@ Linux/OSX : mcs -out:outputname.exe *.cs.
             
 ---
 
-![](https://github.com/bartoszmaka/maze_solver_and_simulator/Readme/sample.mkv)
+![](https://github.com/bartoszmaka/maze_solver_and_simulator/Readme/sample.gif)
