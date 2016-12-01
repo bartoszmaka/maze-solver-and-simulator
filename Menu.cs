@@ -5,18 +5,18 @@ using System.Text;
 
 namespace Zaj08
 {
-    class Menu
+    static class Menu
     {
-        private string[] MenuOptions;
-        private int choice;
-        private bool choosen;
-        public Menu()
+        private static string[] MenuOptions;
+        private static int choice;
+        private static bool choosen;
+        static Menu()
         {
             choosen = false;
             choice = 0;
             FillMenuOptions();
         }
-        public void Play()
+        public static void Play()
         {
             while (!choosen)
             {
@@ -26,7 +26,7 @@ namespace Zaj08
             ApplyChoice();
         }
 
-        private void KeysManager()
+        private static void KeysManager()
         {
             ConsoleKeyInfo pressedKey = Console.ReadKey();
             switch (pressedKey.Key)
@@ -47,36 +47,40 @@ namespace Zaj08
                     break;
             }
         }
-        private void ApplyChoice()
+        private static void ApplyChoice()
         {
-            Game G1;
             switch (choice)
             {
-                case 0:
-                    G1 = new Game();
+                case 0: {
+                    Game.Play("Manual");
                     break;
+                }
                 case 1:
-                    G1 = new Game("Left");
+                    {
+                    Game.Play("Left");
                     break;
-                case 2:
-                    G1 = new Game("Right");
+                }
+                case 2: {
+                    Game.Play("Right");
                     break;
-                case 3:
-                    G1 = new Game("Both");
+                }
+                case 3: {
+                    Game.Play("Both");
                     break;
+                }
                 default:
                     break;
             }
         }
-        private void DecrementChoice()
+        private static void DecrementChoice()
         {
             choice = (choice + 1) % MenuOptions.Length;
         }
-        private void IncrementChoice()
+        private static void IncrementChoice()
         {
             choice = (choice + MenuOptions.Length - 1) % MenuOptions.Length;
         }
-        private void Display()
+        private static void Display()
         {
             Console.Clear();
             for (int i = 0; i < MenuOptions.Length; i++)
@@ -88,7 +92,7 @@ namespace Zaj08
             }
             Console.SetCursorPosition(0, 0);
         }
-        private void FillMenuOptions()
+        private static void FillMenuOptions()
         {
             MenuOptions = new string[]
             {

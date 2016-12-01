@@ -14,7 +14,7 @@ namespace Zaj08
         }
         public static void Push(Maze M, Cursor C, char dir = '0')
         {
-            if (dir != '0') { C.SetDirection(dir); }
+            if (dir != '0') { C.SetDirection(dir); }    // If not parsed direction -> push in current direction
             if (MoveValid(M, C.NextX(), C.NextY())) { C.MoveForward(); }
             else { C.validMove = false; }
         }

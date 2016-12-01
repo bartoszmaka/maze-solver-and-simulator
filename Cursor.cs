@@ -41,7 +41,7 @@ namespace Zaj08
             Console.ResetColor();
             validMove = true;
             Console.SetCursorPosition(0, 0);
-            CursorDebug();
+            //CursorDebug();
         }
         public void SetDirection(char dir)
         {

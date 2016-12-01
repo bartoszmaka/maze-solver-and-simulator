@@ -9,8 +9,7 @@ namespace Zaj08
     {
         static void Main(string[] args)
         {
-            Menu M1 = new Menu();
-            M1.Play();
+            Menu.Play();
         }
     }
 }

@@ -7,18 +7,15 @@ using System.Threading.Tasks;
 
 namespace Zaj08
 {
-    class Game
+    static class Game
     {
-        Cursor[] cursors;
-        Cursor C1 = new Cursor();
-        Cursor C2 = new Cursor(ConsoleColor.DarkCyan, ConsoleColor.DarkYellow);
-        Maze M1 = new Maze();
-        private Dictionary<char, char> directionKeys;
-        private bool win = false;
-        private string options;
-        public Game(string launchOptions = "Manual")
+        static Cursor[] cursors;
+        static Maze M1 = new Maze();
+        private static Dictionary<char, char> directionKeys;
+        private static bool win = false;
+        private static string options;
+        private static void PrepareCursors()
         {
-            options = launchOptions;
             if (options == "Both")
             {
                 cursors = new Cursor[] {
@@ -27,11 +24,15 @@ namespace Zaj08
                 };
             }
             else { cursors = new Cursor[] { new Cursor() }; }
-            FillDirectionKeys();
-            Play();
         }
-        public void Play()
+        static Game()
         {
+            FillDirectionKeys();
+        }
+        public static void Play(string launchOptions = "Manual")
+        {
+            options = launchOptions;
+            PrepareCursors();
             while (!win)
             {
                 Console.Clear();
@@ -43,13 +44,13 @@ namespace Zaj08
             DisplayWinMessage();
         }
 
-        private void DisplayWinMessage()
+        private static void DisplayWinMessage()
         {
             Console.Clear();
             Console.WriteLine("You won!");
             Thread.Sleep(2000);
         }
-        private void MoveCursors(Maze M)
+        private static void MoveCursors(Maze M)
         {
             if (options != "Manual")
             {
@@ -70,18 +71,18 @@ namespace Zaj08
             }
             else { KeysManager(M1, cursors[0]); }
         }
-        private void DrawMaze(Maze M)
+        private static void DrawMaze(Maze M)
         {
             M.Display();
         }
-        private void DrawCursors()
+        private static void DrawCursors()
         {
             foreach (Cursor C in cursors)
             {
                 C.Display();
             }
         }
-        private void FillDirectionKeys()
+        private static void FillDirectionKeys()
         {
             directionKeys = new Dictionary<char, char> {
                 { 'w', '▲'},
@@ -90,14 +91,14 @@ namespace Zaj08
                 { 'd', '►'},
             };
         }
-        private void CheckIfWon(Maze M)
+        private static void CheckIfWon(Maze M)
         {
             foreach (Cursor C in cursors)
             {
                 if (M.FieldIsDot(C.posX, C.posY)) { win = true; }
             }
         }
-        private void KeysManager(Maze M, Cursor C)
+        private static void KeysManager(Maze M, Cursor C)
         {
             char pressedKey = Console.ReadKey().KeyChar;
             if (directionKeys.ContainsKey(pressedKey))
@@ -106,8 +107,7 @@ namespace Zaj08
             }
         }
 
-        // Debug
-        private void AlternativeKeys(Maze M, Cursor C)
+        private static void AlternativeKeys(Maze M, Cursor C)
         {
             char pressedKey = Console.ReadKey().KeyChar;
             switch (pressedKey)

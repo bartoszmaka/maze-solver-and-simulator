@@ -46,7 +46,7 @@ namespace Zaj08
         public bool FieldAvailable(int x, int y)
         {
             if (y >= 0 && x >= 0 && fields[y][x] != '#') { return true; }
-            return false;
+            else { return false; }
         }
         public bool FieldIsDot(int x, int y)
         {
