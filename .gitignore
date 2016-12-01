@@ -1,5 +1,5 @@
 # compiled files
-.exe
+*.exe
 
 # vim tags file
 tags
