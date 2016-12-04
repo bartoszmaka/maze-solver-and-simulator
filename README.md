@@ -1,6 +1,6 @@
 ### Compatibility:
 
-.NET 4.5
+.NET 4.5  
 mono 4.6.2
 
 ### Build instructions:
@@ -9,7 +9,7 @@ mono 4.6.2
 idk, just put this into visual studio, press F5 and hope it will work
 
 ##### Linux / OSX :
-`mcs -out:outputname.exe *.cs `
+`mcs -out:outputname.exe *.cs `  
 `mono outputname.exe`
 
 ---
