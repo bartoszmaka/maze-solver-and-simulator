@@ -1,40 +1,61 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace Zaj08
+﻿namespace Zaj08
 {
     static class MovesValidator
     {
-        private static bool MoveValid(Maze M, int x, int y)
+        /// <summary>
+        /// Pushes given cursor 1 step forward in current direction on given maze
+        /// </summary>
+        /// <param name="currentMaze">maze on which cursor is moving</param>
+        /// <param name="currenCursor">cursor to move</param>
+        public static void PushInCurrentDirection(Maze currentMaze, Cursor currenCursor)
         {
-            if (M.FieldAvailable(x, y)) { return true; }
-            else { return false; }
+            var currentDir = currenCursor.Direction;
+            Push(currentMaze, currenCursor, currentDir);
         }
-        public static void Push(Maze M, Cursor C, char dir = '0')
+        /// <summary>
+        /// Pushes given cursor 1 step forward on given maze in specified direction
+        /// </summary>
+        /// <param name="currentMaze">maze on which cursor is moving</param>
+        /// <param name="currentCursor">cursor to move</param>
+        /// <param name="dir">direction</param>
+        public static void Push(Maze currentMaze, Cursor currentCursor, Direction dir)
         {
-            if (dir != '0') { C.SetDirection(dir); }    // If not parsed direction -> push in current direction
-            if (MoveValid(M, C.NextX(), C.NextY())) { C.MoveForward(); }
-            else { C.validMove = false; }
+            currentCursor.SetDirection(dir);
+            if (currentMaze.FieldAvailable(currentCursor.NextX(), currentCursor.NextY())) currentCursor.MoveForward();
+            else currentCursor.MoveValid = false;
         }
-        private static bool NextFieldUnavaible(Maze M, Cursor C)
+        /// <summary>
+        /// Move cursor automatically sticking to left wall
+        /// </summary>
+        /// <param name="currentMaze">maze on which cursor is moving</param>
+        /// <param name="currentCursor">cursor to move</param>
+        public static void LeftHandMethod(Maze currentMaze, Cursor currentCursor)
         {
-            if (C.NextY() >= 0 && C.NextX() >= 0 &&
-                !(M.FieldAvailable(C.NextX(), C.NextY()))) { return true; }
-            return false;
+            if (currentMaze.FieldAvailable(currentCursor.LeftHandX(), currentCursor.LeftHandY())) currentCursor.TurnAntiClockwise();
+            if (NextFieldUnavaible(currentMaze, currentCursor)) currentCursor.TurnClockwise();
+            PushInCurrentDirection(currentMaze, currentCursor);
         }
-        public static void LeftHandMethod(Maze M, Cursor C)
+        /// <summary>
+        /// Move cursor automatically sticking to right wall
+        /// </summary>
+        /// <param name="currentMaze">maze on which cursor is moving</param>
+        /// <param name="currenCursor">cursor to move</param>
+        public static void RightHandMethod(Maze currentMaze, Cursor currenCursor)
         {
-            if (MoveValid(M, C.LeftHandX(), C.LeftHandY())) { C.TurnAntiClockwise(); }
-            if (NextFieldUnavaible(M, C)) { C.TurnClockwise(); }
-            Push(M, C);
+            if (currentMaze.FieldAvailable(currenCursor.RightHandX(), currenCursor.RightHandY())) currenCursor.TurnClockwise();
+            if (NextFieldUnavaible(currentMaze, currenCursor)) currenCursor.TurnAntiClockwise();
+            PushInCurrentDirection(currentMaze, currenCursor);
         }
-        public static void RightHandMethod(Maze M, Cursor C)
+
+        /// <summary>
+        /// Tells if cursor is able to take 1 step forward
+        /// </summary>
+        /// <param name="currentMaze">maze on which cursor is moving</param>
+        /// <param name="currentCursor">cursor to move</param>
+        private static bool NextFieldUnavaible(Maze currentMaze, Cursor currentCursor)
         {
-            if (MoveValid(M, C.RightHandX(), C.RightHandY())) { C.TurnClockwise(); }
-            if (NextFieldUnavaible(M, C)) { C.TurnAntiClockwise(); }
-            Push(M, C);
+            return currentCursor.NextY() >= 0 && currentCursor.NextX() >= 0 &&
+                   !currentMaze.FieldAvailable(currentCursor.NextX(), currentCursor.NextY());
         }
     }
 }
