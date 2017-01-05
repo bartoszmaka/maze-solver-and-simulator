@@ -1,25 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
-//"########################",
-//"     #                 #",
-//"#### ## #############  #",
-//"#    #     #           #",
-//"#    #     #     #     #",
-//"## #### ##### ##########",
-//"#    #     #           #",
-//"#          #     #     #",
-//"##################.#####"
 namespace Zaj08
 {
     class Maze
     {
-        private string[] fields;
+        /// <summary>
+        /// Actual maze structure
+        /// </summary>
+        private readonly string[] _fields;
+
         public Maze()
         {
-            fields = new string[]
+            _fields = new string[]
             {
                 "########################",
                 "     #                 #",
@@ -32,9 +24,13 @@ namespace Zaj08
                 "##################.#####"
             };
         }
+
+        /// <summary>
+        /// Prints maze on console
+        /// </summary>
         public void Display()
         {
-            foreach (string line in fields)
+            foreach (string line in _fields)
             {
                 foreach (char sign in line)
                 {
@@ -43,15 +39,26 @@ namespace Zaj08
                 Console.WriteLine();
             }
         }
+        /// <summary>
+        /// Tells if given field is available
+        /// </summary>
+        /// <param name="x">row</param>
+        /// <param name="y">column</param>
+        /// <returns>true if field is available, false otherwise</returns>
         public bool FieldAvailable(int x, int y)
         {
-            if (y >= 0 && x >= 0 && fields[y][x] != '#') { return true; }
-            else { return false; }
+            return y >= 0 && x >= 0 && _fields[y][x] != '#';
         }
+        /// <summary>
+        /// Tells if given field is dot
+        /// </summary>
+        /// <remarks>game is over, when cursor reaches dot</remarks>
+        /// <param name="x">row</param>
+        /// <param name="y">column</param>
+        /// <returns>true if field is dot, false otherwise</returns>
         public bool FieldIsDot(int x, int y)
         {
-            if (fields[y][x] == '.') { return true; }
-            else { return false; }
+            return _fields[y][x] == '.';
         }
     }
 }

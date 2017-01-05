@@ -9,7 +9,9 @@ mono 4.6.2
 idk, just put this into visual studio, press F5 and hope it will work
 
 ##### Linux / OSX :
-`mcs -out:outputname.exe *.cs `  
+`git clone https://github.com/bartoszmaka/maze_solver_and_simulator`  
+`cd maze_solver_and_simulator`  
+`mcs -out:outputname.exe *.cs`  
 `mono outputname.exe`
 
 ---

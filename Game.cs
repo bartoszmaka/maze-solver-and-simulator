@@ -1,45 +1,63 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Zaj08
 {
-    static class Game
+    public sealed class Game
     {
-        static Cursor[] cursors;
-        static Maze M1 = new Maze();
-        private static Dictionary<char, char> directionKeys;
-        private static bool win = false;
-        private static string options;
-        private static void PrepareCursors()
+        /// <summary>
+        /// Gets game singleton instance
+        /// </summary>
+        public static Game Instance
         {
-            if (options == "Both")
+            get
             {
-                cursors = new Cursor[] {
-                    new Cursor(),
-                    new Cursor(ConsoleColor.DarkCyan, ConsoleColor.DarkYellow)
-                };
+                lock (Padlock)
+                {
+                    if (_instance == null)
+                    {
+                        _instance = new Game();
+                    }
+                    return _instance;
+                }
             }
-            else { cursors = new Cursor[] { new Cursor() }; }
         }
-        static Game()
+        private static readonly object Padlock = new object();
+        private static Game _instance = null;
+        private GameOption _launchOption;
+        /// <summary>
+        /// Stores cursors that take part in game
+        /// </summary>
+        /// <remarks>depending on launchOption, there might be 1 or 2 cursors</remarks>
+        private Cursor[] _cursors;
+        private Maze _currentMaze = new Maze();
+        private Dictionary<ConsoleKey, Direction> _directionKeys;
+        /// <summary>
+        /// Tells if any cursor won already
+        /// </summary>
+        private bool _win = false;
+
+        private Game()
         {
             FillDirectionKeys();
         }
-        public static void Play(string launchOptions = "Manual")
+
+        /// <summary>
+        /// Starts game in given mode
+        /// </summary>
+        /// <param name="launchOption">game mode</param>
+        public void Play(GameOption launchOption = GameOption.ManualNormal)
         {
-            options = launchOptions;
+            _launchOption = launchOption;
             PrepareCursors();
-            while (!win)
+            while (!_win)
             {
                 Console.Clear();
-                DrawMaze(M1);
+                _currentMaze.Display();
                 DrawCursors();
-                MoveCursors(M1);
-                CheckIfWon(M1);
+                MoveCursors();
+                CheckIfWon();
             }
             DisplayWinMessage();
         }
@@ -50,82 +68,130 @@ namespace Zaj08
             Console.WriteLine("You won!");
             Thread.Sleep(2000);
         }
-        private static void MoveCursors(Maze M)
+        /// <summary>
+        /// Move cursors with method dependent on game mode
+        /// </summary>
+        /// <param name="m">given maze</param>
+        private void MoveCursors()
         {
-            if (options != "Manual")
+            switch (_launchOption)
             {
-                switch (options)
-                {
-                    case "Left":
-                        MovesValidator.LeftHandMethod(M, cursors[0]);
-                        break;
-                    case "Right":
-                        MovesValidator.RightHandMethod(M, cursors[0]);
-                        break;
-                    case "Both":
-                        MovesValidator.LeftHandMethod(M, cursors[0]);
-                        MovesValidator.RightHandMethod(M, cursors[1]);
-                        break;
-                }
-                Thread.Sleep(100);
-            }
-            else { KeysManager(M1, cursors[0]); }
-        }
-        private static void DrawMaze(Maze M)
-        {
-            M.Display();
-        }
-        private static void DrawCursors()
-        {
-            foreach (Cursor C in cursors)
-            {
-                C.Display();
+                case GameOption.ManualNormal:
+                    KeysManager(_cursors[0]);
+                    break;
+                case GameOption.ManualAlternative:
+                    AlternativeKeys(_cursors[0]);
+                    break;
+                case GameOption.AutoLeft:
+                    MovesValidator.LeftHandMethod(_currentMaze, _cursors[0]);
+                    Thread.Sleep(100);
+                    break;
+                case GameOption.AutoRight:
+                    MovesValidator.RightHandMethod(_currentMaze, _cursors[0]);
+                    Thread.Sleep(100);
+                    break;
+                case GameOption.AutoComparsion:
+                    MovesValidator.LeftHandMethod(_currentMaze, _cursors[0]);
+                    MovesValidator.RightHandMethod(_currentMaze, _cursors[1]);
+                    Thread.Sleep(100);
+                    break;
             }
         }
-        private static void FillDirectionKeys()
+        /// <summary>
+        /// Draws all cursors
+        /// </summary>
+        private void DrawCursors()
         {
-            directionKeys = new Dictionary<char, char> {
-                { 'w', '▲'},
-                { 's', '▼'},
-                { 'a', '◄'},
-                { 'd', '►'},
+            foreach (Cursor currentCursor in _cursors)
+            {
+                currentCursor.Display();
+            }
+        }
+        /// <summary>
+        /// Fills key - direction pairs
+        /// </summary>
+        /// <remarks>Separated to method for readability</remarks>
+        private void FillDirectionKeys()
+        {
+            _directionKeys = new Dictionary<ConsoleKey, Direction> {
+                { ConsoleKey.W, Direction.North },
+                { ConsoleKey.UpArrow, Direction.North },
+                { ConsoleKey.S, Direction.South },
+                { ConsoleKey.DownArrow, Direction.South },
+                { ConsoleKey.A, Direction.West },
+                { ConsoleKey.LeftArrow, Direction.West },
+                { ConsoleKey.D, Direction.East },
+                { ConsoleKey.RightArrow, Direction.East },
             };
         }
-        private static void CheckIfWon(Maze M)
+        /// <summary>
+        /// Checks if any cursor reached dot field
+        /// </summary>
+        private void CheckIfWon()
         {
-            foreach (Cursor C in cursors)
+            foreach (Cursor currentCursor in _cursors)
             {
-                if (M.FieldIsDot(C.posX, C.posY)) { win = true; }
+                if (_currentMaze.FieldIsDot(currentCursor.PosX, currentCursor.PosY)) { _win = true; }
             }
         }
-        private static void KeysManager(Maze M, Cursor C)
+        /// <summary>
+        /// Basic controls - wsad moves cursor to corresponding direction
+        /// </summary>
+        /// <param name="currentCursor">cursor to move</param>
+        private void KeysManager(Cursor currentCursor)
         {
-            char pressedKey = Console.ReadKey().KeyChar;
-            if (directionKeys.ContainsKey(pressedKey))
+            ConsoleKeyInfo pressedKey = Console.ReadKey();
+            if (_directionKeys.ContainsKey(pressedKey.Key))
             {
-                MovesValidator.Push(M, C, directionKeys[pressedKey]);
+                MovesValidator.Push(_currentMaze, currentCursor, _directionKeys[pressedKey.Key]);
             }
         }
-
-        private static void AlternativeKeys(Maze M, Cursor C)
+        /// <summary>
+        /// Alternative controls -> w to push, asd to turn
+        /// </summary>
+        /// <param name="currentCursor">cursor to move</param>
+        private void AlternativeKeys(Cursor currentCursor)
         {
-            char pressedKey = Console.ReadKey().KeyChar;
-            switch (pressedKey)
+            ConsoleKeyInfo pressedKey = Console.ReadKey();
+            switch (pressedKey.Key)
             {
-                case 'w':
-                    MovesValidator.Push(M, C);
+                case ConsoleKey.W:
+                case ConsoleKey.UpArrow:
+                    MovesValidator.PushInCurrentDirection(_currentMaze, currentCursor);
                     break;
-                case 's':
-                    C.TurnAround();
+                case ConsoleKey.S:
+                case ConsoleKey.DownArrow:
+                    currentCursor.TurnAround();
                     break;
-                case 'a':
-                    C.TurnAntiClockwise();
+                case ConsoleKey.A:
+                case ConsoleKey.LeftArrow:
+                    currentCursor.TurnAntiClockwise();
                     break;
-                case 'd':
-                    C.TurnClockwise();
+                case ConsoleKey.D:
+                case ConsoleKey.RightArrow:
+                    currentCursor.TurnClockwise();
                     break;
-                default:
-                    break;
+            }
+        }
+        /// <summary>
+        /// Initialize cursors depending on launch mode
+        /// </summary>
+        private void PrepareCursors()
+        {
+            if (_launchOption == GameOption.AutoComparsion)
+            {
+                _cursors = new Cursor[] 
+                {
+                    new Cursor(),
+                    new Cursor(ConsoleColor.DarkCyan, ConsoleColor.DarkYellow)
+                };
+            }
+            else
+            {
+                _cursors = new Cursor[] 
+                {
+                    new Cursor()
+                };
             }
         }
     }
