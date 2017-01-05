@@ -71,7 +71,6 @@ namespace Zaj08
         /// <summary>
         /// Move cursors with method dependent on game mode
         /// </summary>
-        /// <param name="m">given maze</param>
         private void MoveCursors()
         {
             switch (_launchOption)
@@ -180,7 +179,7 @@ namespace Zaj08
         {
             if (_launchOption == GameOption.AutoComparsion)
             {
-                _cursors = new Cursor[] 
+                _cursors = new Cursor[]
                 {
                     new Cursor(),
                     new Cursor(ConsoleColor.DarkCyan, ConsoleColor.DarkYellow)
@@ -188,7 +187,7 @@ namespace Zaj08
             }
             else
             {
-                _cursors = new Cursor[] 
+                _cursors = new Cursor[]
                 {
                     new Cursor()
                 };
